@@ -5,10 +5,7 @@ namespace ShootEmUp
     public class PlayerFireController : MonoBehaviour
     {
         [SerializeField]
-        private Player m_character;
-
-        [SerializeField]
-        private BulletSpawner m_bulletSpawner;
+        private Weapon m_playerWeapon;
 
         [SerializeField]
         private InputManager m_inputManager;
@@ -20,13 +17,7 @@ namespace ShootEmUp
 
         private void OnFireTriggered()
         {
-            m_bulletSpawner.SpawnBullet(
-                m_character.FirePoint.position,
-                Color.blue,
-                (int)PhysicsLayer.PLAYER_BULLET,
-                1,
-                m_character.FirePoint.rotation * Vector3.up * 3
-            );
+            m_playerWeapon.Fire(Vector2.up);
         }
 
         private void OnDisable()

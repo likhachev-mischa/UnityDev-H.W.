@@ -1,47 +1,24 @@
-using System;
 using UnityEngine;
 
 namespace ShootEmUp
 {
     public sealed class Enemy : MonoBehaviour
     {
-        public delegate void FireHandler(Vector2 position, Vector2 direction);
+        [field: SerializeField]
+        public Ship Ship { get; private set; }
 
-        public event FireHandler OnFire;
+        [field:SerializeField]
+        public Weapon Weapon { get; private set; }
 
-        [SerializeField]
-        public Transform FirePoint;
-
-        [SerializeField]
-        public int Health;
-
-        [SerializeField]
-        public Rigidbody2D Rigidbody;
-
-        [SerializeField]
-        public float Speed = 5.0f;
-
-        [NonSerialized]
-        public Player Target;
-
-        [SerializeField]
+    [SerializeField]
         private float m_countdown;
+
+        private Ship m_target;
 
         private Vector2 m_destination;
         private float m_currentTime;
         private bool m_isPointReached;
-
         private int m_initialHealth;
-
-        private void Awake()
-        {
-            m_initialHealth = Health;
-        }
-
-        private void OnEnable()
-        {
-            Health = m_initialHealth;
-        }
 
         public void SetDestination(Vector2 endPoint)
         {
@@ -49,24 +26,47 @@ namespace ShootEmUp
             m_isPointReached = false;
         }
 
-        //cringe
+        public void SetTarget(Ship target)
+        {
+            m_target = target;
+        }
+
+        public void SetParent(Transform parent)
+        {
+            transform.SetParent(parent);
+        }
+
+        public void SetPosition(in Vector2 position)
+        {
+            transform.position = position;
+        }
+
+        private void Awake()
+        {
+            m_initialHealth = Ship.Health;
+        }
+
+        private void OnEnable()
+        {
+            Ship.SetHealth(m_initialHealth);
+        }
+        
         private void FixedUpdate()
         {
             if (m_isPointReached)
             {
                 //Attack:
-                if (Target.Health <= 0)
+                if (m_target.Health <= 0)
                     return;
 
                 m_currentTime -= Time.fixedDeltaTime;
                 if (m_currentTime <= 0)
                 {
-                    Vector2 startPosition = FirePoint.position;
-                    Vector2 vector = (Vector2)Target.transform.position - startPosition;
+                    Vector2 startPosition = Weapon.FirePoint.position;
+                    Vector2 vector = (Vector2)m_target.transform.position - startPosition;
                     Vector2 direction = vector.normalized;
-                    OnFire?.Invoke(startPosition, direction);
+                    Weapon.Fire(direction);
 
-                    //       m_currentTime += m_countdown;
                     m_currentTime = m_countdown;
                 }
             }
@@ -80,9 +80,8 @@ namespace ShootEmUp
                     return;
                 }
 
-                Vector2 direction = vector.normalized * Time.fixedDeltaTime;
-                Vector2 nextPosition = Rigidbody.position + direction * Speed;
-                Rigidbody.MovePosition(nextPosition);
+                Vector2 direction = vector.normalized;
+                Ship.Move(direction);
             }
         }
     }

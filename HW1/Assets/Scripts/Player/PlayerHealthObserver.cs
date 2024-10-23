@@ -8,11 +8,11 @@ namespace ShootEmUp
         private GameManager m_gameManager;
 
         [SerializeField]
-        private Player m_player;
+        private Ship m_playerShip;
 
         private void OnEnable()
         {
-            m_player.OnHealthEmpty += OnPlayerHealthEmpty;
+            m_playerShip.OnHealthEmpty += OnPlayerHealthEmpty;
         }
 
         private void OnPlayerHealthEmpty()
@@ -22,7 +22,7 @@ namespace ShootEmUp
 
         private void OnDisable()
         {
-            m_player.OnHealthEmpty -= OnPlayerHealthEmpty;
+            m_playerShip.OnHealthEmpty -= OnPlayerHealthEmpty;
         }
     }
 }

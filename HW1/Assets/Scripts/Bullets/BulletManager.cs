@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -39,6 +38,11 @@ namespace ShootEmUp
 
         private void FixedUpdate()
         {
+            CheckLevelBounds();
+        }
+
+        private void CheckLevelBounds()
+        {
             for (int i = 0, count = m_bullets.Count; i < count; i++)
             {
                 Bullet bullet = m_bullets[i];
@@ -55,14 +59,7 @@ namespace ShootEmUp
 
             m_toBeRemovedIdxs.Clear();
         }
-
-        private void OnBulletCollision(Bullet bullet, Collision2D collision)
-        {
-            DealDamage(bullet, collision.gameObject);
-            bullet.transform.SetParent(m_container);
-            RemoveBullet(bullet);
-        }
-
+        
         private void RemoveBullet(Bullet bullet)
         {
             m_bullets.Remove(bullet);
@@ -71,21 +68,10 @@ namespace ShootEmUp
             m_bulletPool.ReturnObject(bullet);
         }
 
-        //cringe
-        private void DealDamage(Bullet bullet, GameObject other)
+        private void OnBulletCollision(Bullet bullet, Collision2D collision)
         {
-            int damage = bullet.Damage;
-            if (damage <= 0)
-                return;
-
-            if (other.TryGetComponent(out Player player))
-            {
-                player.DecreaseHealth(damage);
-            }
-            else if (other.TryGetComponent(out Enemy enemy))
-            {
-                enemy.Health = Mathf.Max(0, enemy.Health - damage);
-            }
+            bullet.transform.SetParent(m_container);
+            RemoveBullet(bullet);
         }
 
         private void OnDestroy()

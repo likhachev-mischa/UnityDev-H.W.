@@ -415,7 +415,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32dae85f8264479bac19d85418d92392, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_enemyLimit: 4
   m_spawnPositions:
   - {fileID: 5098186055898699330}
   - {fileID: 3822857799868723767}
@@ -435,11 +434,12 @@ MonoBehaviour:
   - {fileID: 1549378007}
   - {fileID: 78117031}
   - {fileID: 883274640}
-  m_character: {fileID: 4414282821800802405}
   m_worldTransform: {fileID: 1683128698}
   m_container: {fileID: 178513672}
-  m_prefab: {fileID: 102605417607457000, guid: 87fe189881a524806800482ac8eaaa83, type: 3}
   m_bulletSpawner: {fileID: 363245577}
+  m_enemyLimit: 4
+  m_prefab: {fileID: 102605417607457000, guid: 87fe189881a524806800482ac8eaaa83, type: 3}
+  m_target: {fileID: 4414282821800802398}
 --- !u!1 &883274639
 GameObject:
   m_ObjectHideFlags: 0
@@ -847,7 +847,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c57ed31af8d94ec3b11df7e2b588d40f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_character: {fileID: 4414282821800802405}
+  m_playerShip: {fileID: 4414282821800802398}
   m_inputManager: {fileID: 3951702117947426123}
 --- !u!114 &1879759791
 MonoBehaviour:
@@ -862,7 +862,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_gameManager: {fileID: 1525845389}
-  m_player: {fileID: 4414282821800802405}
+  m_playerShip: {fileID: 4414282821800802398}
 --- !u!114 &1879759792
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -875,8 +875,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a4bddfe206f441199b4a3b1f11c4e83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_character: {fileID: 4414282821800802405}
-  m_bulletSpawner: {fileID: 363245577}
+  m_playerWeapon: {fileID: 4414282821800802397}
   m_inputManager: {fileID: 3951702117947426123}
 --- !u!1 &61006797492197339
 GameObject:
@@ -1317,6 +1316,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7665021199003362721, guid: 9699e7e809fd44b2bbf3d30c951ecbd2,
+        type: 3}
+      propertyPath: m_bulletSpawner
+      value: 
+      objectReference: {fileID: 363245577}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1428,16 +1432,28 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 3926786964592264468}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4414282821800802405 stripped
+--- !u!114 &4414282821800802397 stripped
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6799125967610205483, guid: 9699e7e809fd44b2bbf3d30c951ecbd2,
+  m_CorrespondingSourceObject: {fileID: 7665021199003362721, guid: 9699e7e809fd44b2bbf3d30c951ecbd2,
     type: 3}
   m_PrefabInstance: {fileID: 3926786964592264468}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 558b312fd53c491ab69f3e55255aae3c, type: 3}
+  m_Script: {fileID: 11500000, guid: 71c719c8b12d4475a3d1393f0818f5bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4414282821800802398 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1350216620962326741, guid: 9699e7e809fd44b2bbf3d30c951ecbd2,
+    type: 3}
+  m_PrefabInstance: {fileID: 3926786964592264468}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b80d1cae04164ce8899cf00e6a802997, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &4788406047096451828

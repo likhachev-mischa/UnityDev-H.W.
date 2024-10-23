@@ -9,19 +9,19 @@ namespace ShootEmUp
 
         public void SpawnBullet(
             Vector2 position,
+            int damage,
             Color color,
             int physicsLayer,
-            int damage,
             Vector2 velocity
         )
         {
             Bullet bullet = m_bulletManager.SpawnBullet();
 
-            bullet.transform.position = position;
-            bullet.SpriteRenderer.color = color;
-            bullet.gameObject.layer = physicsLayer;
-            bullet.Damage = damage;
-            bullet.Rigidbody.velocity = velocity;
+            bullet.SetPosition(position);
+            bullet.SetDamage(damage);
+            bullet.SetColor(color);
+            bullet.SetPhysicsLayer(physicsLayer);
+            bullet.SetVelocity(velocity);
         }
     }
 }

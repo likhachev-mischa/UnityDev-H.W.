@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 5568771391735819375}
   - component: {fileID: 659620479434099170}
   - component: {fileID: 102605417607457000}
+  - component: {fileID: 8273869754275360359}
+  - component: {fileID: 3106987597908148712}
   m_Layer: 11
   m_Name: Enemy
   m_TagString: Untagged
@@ -162,12 +164,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e09a324f54d94d6e84681731f36566c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  IsPlayer: 0
-  FirePoint: {fileID: 3195880656587174614}
-  Health: 5
-  Rigidbody: {fileID: 659620479434099170}
-  Speed: 5
+  <Ship>k__BackingField: {fileID: 8273869754275360359}
+  <Weapon>k__BackingField: {fileID: 3106987597908148712}
   m_countdown: 3
+--- !u!114 &8273869754275360359
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559606060570185700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b80d1cae04164ce8899cf00e6a802997, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Health>k__BackingField: 5
+  m_rigidbody: {fileID: 659620479434099170}
+  m_physicsLayer: 11
+  m_speed: 5
+--- !u!114 &3106987597908148712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559606060570185700}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71c719c8b12d4475a3d1393f0818f5bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <FirePoint>k__BackingField: {fileID: 3195880656587174614}
+  m_bulletSpawner: {fileID: 0}
+  m_physicsLayer: 13
+  m_color: {r: 1, g: 0, b: 0, a: 1}
+  m_damage: 1
+  m_velocity: 3
 --- !u!1 &2239154907127902911
 GameObject:
   m_ObjectHideFlags: 0

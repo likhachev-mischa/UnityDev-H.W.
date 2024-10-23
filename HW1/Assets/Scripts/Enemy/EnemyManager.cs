@@ -7,16 +7,10 @@ namespace ShootEmUp
     public sealed class EnemyManager : MonoBehaviour
     {
         [SerializeField]
-        private int m_enemyLimit;
-
-        [SerializeField]
         private Transform[] m_spawnPositions;
 
         [SerializeField]
         private Transform[] m_attackPositions;
-
-        [SerializeField]
-        private Player m_character;
 
         [SerializeField]
         private Transform m_worldTransform;
@@ -25,10 +19,16 @@ namespace ShootEmUp
         private Transform m_container;
 
         [SerializeField]
+        private BulletSpawner m_bulletSpawner;
+
+        [SerializeField]
+        private int m_enemyLimit;
+
+        [SerializeField]
         private Enemy m_prefab;
 
         [SerializeField]
-        private BulletSpawner m_bulletSpawner;
+        private Ship m_target;
 
         private ObjectPool<Enemy> m_enemyPool;
         private List<Enemy> m_enemies = new();
@@ -55,19 +55,16 @@ namespace ShootEmUp
 
             Enemy enemy = m_enemyPool.GetObject();
             m_enemies.Add(enemy);
-            enemy.transform.SetParent(m_worldTransform);
+            enemy.SetParent(m_worldTransform);
 
             Transform spawnPosition = RandomPoint(this.m_spawnPositions);
-            enemy.transform.position = spawnPosition.position;
+            enemy.SetPosition(spawnPosition.position);
+
+            enemy.Weapon.SetBulletSpawner(m_bulletSpawner);
 
             Transform attackPosition = RandomPoint(this.m_attackPositions);
             enemy.SetDestination(attackPosition.position);
-            enemy.Target = m_character;
-
-            if (m_enemies.Count < 5)
-            {
-                enemy.OnFire += OnFire;
-            }
+            enemy.SetTarget(m_target);
         }
 
         private void FixedUpdate()
@@ -79,15 +76,12 @@ namespace ShootEmUp
                 m_timer = Random.Range(1, 2);
             }
 
-
             for (int i = 0; i < m_enemies.Count; ++i)
             {
                 Enemy enemy = m_enemies[i];
-                if (enemy.Health <= 0)
+                if (enemy.Ship.Health <= 0)
                 {
-                    enemy.OnFire -= OnFire;
                     enemy.transform.SetParent(m_container);
-
                     m_toBeRemovedIdxs.Add(i);
                 }
             }
@@ -100,17 +94,6 @@ namespace ShootEmUp
             }
 
             m_toBeRemovedIdxs.Clear();
-        }
-
-        private void OnFire(Vector2 position, Vector2 direction)
-        {
-            m_bulletSpawner.SpawnBullet(
-                position,
-                Color.red,
-                (int)PhysicsLayer.ENEMY_BULLET,
-                1,
-                direction * 2
-            );
         }
 
         private Transform RandomPoint(Transform[] points)

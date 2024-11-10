@@ -8,6 +8,8 @@ namespace Inventories
 {
     public sealed class Inventory : IEnumerable<Item>
     {
+        private static ItemComparer ITEM_COMPARER = new();
+
         public event Action<Item, Vector2Int> OnAdded;
         public event Action<Item, Vector2Int> OnRemoved;
         public event Action<Item, Vector2Int> OnMoved;
@@ -17,7 +19,7 @@ namespace Inventories
         public int Height { get; private set; }
         public int Count { get; private set; }
 
-        private List<Item> m_items = new();
+        private Dictionary<Item, Vector2Int> m_items = new();
 
         private Item[,] m_matrix;
 
@@ -172,7 +174,7 @@ namespace Inventories
                 return false;
             }
 
-            m_items.Add(item);
+            m_items.Add(item, new Vector2Int(posX, posY));
             SetItemPositionMatrix(item, posX, posY, item.Size.x, item.Size.y);
             ++Count;
             OnAdded?.Invoke(item, new Vector2Int(posX, posY));
@@ -274,15 +276,12 @@ namespace Inventories
         /// </summary>
         public bool Contains(in Item item)
         {
-            foreach (Item key in m_items)
+            if (item == null)
             {
-                if (item.Equals(key))
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            return m_items.ContainsKey(item);
         }
 
         /// <summary>
@@ -321,14 +320,12 @@ namespace Inventories
 
         public bool RemoveItem(in Item item, out Vector2Int position)
         {
-            if (!Contains(item))
+            if (item == null || !m_items.Remove(item, out position))
             {
                 position = default;
                 return false;
             }
 
-            position = GetPositions(item)[0];
-            m_items.Remove(item);
             SetItemPositionMatrix(null, position.x, position.y, item.Size.x, item.Size.y);
             --Count;
             OnRemoved?.Invoke(item, position);
@@ -385,18 +382,14 @@ namespace Inventories
                 throw new KeyNotFoundException("Item not found!");
             }
 
+            Vector2Int topLeftPosition = m_items[item];
             Vector2Int[] result = new Vector2Int[item.Size.x * item.Size.y];
             int resultIdx = 0;
-            for (int w = 0; w < Width; ++w)
+            for (int w = topLeftPosition.x; w < topLeftPosition.x + item.Size.x; ++w)
+            for (int h = topLeftPosition.y; h < topLeftPosition.y + item.Size.y; ++h)
             {
-                for (int h = 0; h < Height; ++h)
-                {
-                    if (m_matrix[w, h] != null && m_matrix[w, h].Equals(item))
-                    {
-                        result[resultIdx] = new Vector2Int(w, h);
-                        ++resultIdx;
-                    }
-                }
+                result[resultIdx] = new Vector2Int(w, h);
+                ++resultIdx;
             }
 
             return result;
@@ -441,7 +434,7 @@ namespace Inventories
         public int GetItemCount(string name)
         {
             int count = 0;
-            foreach (Item item in m_items)
+            foreach ((Item item, Vector2Int value) in m_items)
             {
                 if (item.Name == null)
                 {
@@ -487,6 +480,8 @@ namespace Inventories
                 m_matrix[vec.x, vec.y] = null;
             }
 
+            m_items[item] = position;
+
             SetItemPositionMatrix(item, position.x, position.y, item.Size.x, item.Size.y);
             OnMoved?.Invoke(item, position);
             return true;
@@ -503,9 +498,9 @@ namespace Inventories
                 m_matrix[w, h] = null;
             }
 
-            var sortedItems = m_items.OrderByDescending(i => i, new ItemComparer());
+            var sortedItems = m_items.OrderByDescending(i => i.Key, ITEM_COMPARER);
 
-            foreach (Item item in sortedItems)
+            foreach ((Item item, Vector2Int value) in sortedItems)
             {
                 FindFreePosition(item, out Vector2Int pos);
                 SetItemPositionMatrix(item, pos.x, pos.y, item.Size.x, item.Size.y);
@@ -537,7 +532,7 @@ namespace Inventories
 
         public IEnumerator<Item> GetEnumerator()
         {
-            return m_items.GetEnumerator();
+            return m_items.Keys.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -580,6 +575,32 @@ namespace Inventories
             }
 
             return true;
+        }
+
+        private class ItemComparer : Comparer<Item>
+        {
+            public override int Compare(Item x, Item y)
+            {
+                if (x == null && y == null)
+                {
+                    return 0;
+                }
+
+                if (x == null)
+                {
+                    return -1;
+                }
+
+                if (y == null)
+                {
+                    return 1;
+                }
+
+                int sizeX = x.Size.x * x.Size.y;
+                int sizeY = y.Size.x * y.Size.y;
+                int result = sizeX > sizeY ? 1 : sizeX < sizeY ? -1 : 0;
+                return result;
+            }
         }
     }
 }

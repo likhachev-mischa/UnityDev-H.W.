@@ -14,10 +14,11 @@ namespace SnakeGame
 
         public override void InstallBindings()
         {
-            Container.BindMemoryPool<Coin, CoinSpawner>().FromComponentInNewPrefab(m_coinPrefab)
+            Container.BindMemoryPool<Coin, MonoMemoryPool<Coin>>().FromComponentInNewPrefab(m_coinPrefab)
                 .UnderTransform(m_parent).AsSingle();
 
-            Container.Bind<ICoinSpawner>().To<CoinSpawner>().FromResolve();
+            Container.BindInterfacesTo<CoinManager>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<CoinSpawnController>().AsSingle().NonLazy();
         }
     }
 }

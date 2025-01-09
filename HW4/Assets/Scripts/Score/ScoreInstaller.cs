@@ -3,12 +3,12 @@ using Zenject;
 
 namespace SnakeGame
 {
-    public class GameStateInstaller: Installer<GameStateInstaller>
+    public class ScoreInstaller: Installer<ScoreInstaller>
     {
         public override void InstallBindings()
         {
             Container.BindInterfacesTo<Score>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<GameStateController>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<ScoreController>().AsSingle().NonLazy();
         }
     }
 }

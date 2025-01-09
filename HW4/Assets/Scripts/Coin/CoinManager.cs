@@ -1,53 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Modules;
 using UnityEngine;
 using Zenject;
 
 namespace SnakeGame
 {
-    public class CoinSpawner : MonoMemoryPool<Coin>, ICoinSpawner
+    public class CoinManager : ICoinSpawner
     {
+        public event Action<ICoin> CoinDespawned;
+
         public List<ICoin> Coins { get; } = new();
 
+        private MonoMemoryPool<Coin> m_pool;
         private IWorldBounds m_worldBounds;
 
         [Inject]
-        public void Construct(IWorldBounds worldBounds)
+        public void Construct(IWorldBounds worldBounds, MonoMemoryPool<Coin> pool)
         {
             m_worldBounds = worldBounds;
+            m_pool = pool;
         }
 
         ICoin ICoinSpawner.Spawn()
         {
-            return Spawn();
+            var coin = m_pool.Spawn();
+            Coins.Add(coin);
+
+            coin.Generate();
+            SetPosition(coin);
+
+            return coin;
         }
 
         void ICoinSpawner.Despawn(ICoin coin)
         {
-            Despawn((Coin)coin);
+            Coins.Remove(coin);
+            m_pool.Despawn((Coin)coin);
+            CoinDespawned?.Invoke(coin);
         }
-        
+
         bool ICoinSpawner.IsEmpty()
         {
             return Coins.Count == 0;
-        }
-
-        protected override void Reinitialize(Coin item)
-        {
-            item.Generate();
-            SetPosition(item);
-        }
-
-        protected override void OnSpawned(Coin item)
-        {
-            base.OnSpawned(item);
-            Coins.Add(item);
-        }
-
-        protected override void OnDespawned(Coin item)
-        {
-            base.OnDespawned(item);
-            Coins.Remove(item);
         }
 
         //possible infinite loop if there are too many coins

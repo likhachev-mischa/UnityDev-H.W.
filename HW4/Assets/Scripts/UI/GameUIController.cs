@@ -8,25 +8,25 @@ namespace SnakeGame
     {
         private readonly IGameUI m_gameUI;
 
-        private readonly GameStateController m_gameStateController;
+        private readonly GameCycle m_gameCycle;
 
         private readonly IScore m_score;
         private readonly IDifficulty m_difficulty;
 
-        public GameUIController(IGameUI gameUI, GameStateController gameStateController, IScore score,
+        public GameUIController(IGameUI gameUI, GameCycle gameCycle, IScore score,
             IDifficulty difficulty)
         {
             m_gameUI = gameUI;
-            m_gameStateController = gameStateController;
+            m_gameCycle = gameCycle;
             m_score = score;
             m_difficulty = difficulty;
         }
 
         void IInitializable.Initialize()
         {
-            m_gameStateController.GameStarted += OnGameStarted;
-            m_gameStateController.GameWon += OnGameWon;
-            m_gameStateController.GameLost += OnGameLost;
+            m_gameCycle.GameStarted += OnGameStarted;
+            m_gameCycle.GameWon += OnGameWon;
+            m_gameCycle.GameLost += OnGameLost;
             
             m_score.OnStateChanged += OnScoreChanged;
             m_difficulty.OnStateChanged += OnDifficultyChanged;
@@ -34,9 +34,9 @@ namespace SnakeGame
 
         void IDisposable.Dispose()
         {
-            m_gameStateController.GameStarted -= OnGameStarted;
-            m_gameStateController.GameWon -= OnGameWon;
-            m_gameStateController.GameLost -= OnGameLost;
+            m_gameCycle.GameStarted -= OnGameStarted;
+            m_gameCycle.GameWon -= OnGameWon;
+            m_gameCycle.GameLost -= OnGameLost;
             
             m_score.OnStateChanged -= OnScoreChanged;
             m_difficulty.OnStateChanged -= OnDifficultyChanged;

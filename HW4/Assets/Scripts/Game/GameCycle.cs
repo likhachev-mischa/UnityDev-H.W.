@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace SnakeGame
 {
-    public class GameStateController
+    public class GameCycle
     {
         public event Action GameStarted;
         public event Action GameWon;

@@ -6,8 +6,7 @@ namespace SnakeGame
     {
         public override void InstallBindings()
         {
-            Container.BindInterfacesTo<InputController>().AsSingle().NonLazy();
-            Container.BindInterfacesTo<SnakeMoveController>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<InputAdapter>().AsSingle().NonLazy();
         }
     }
 }

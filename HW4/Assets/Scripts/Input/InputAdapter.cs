@@ -1,29 +1,30 @@
-﻿using UnityEngine;
+﻿using Modules;
+using UnityEngine;
 using Zenject;
 
 namespace SnakeGame
 {
-    public class InputController : IInputController, ITickable
+    public class InputAdapter : IInputAdapter, ITickable
     {
-        public Vector2Int Direction { get; private set; }
+        public SnakeDirection Direction { get; private set; }
 
         public void Tick()
         {
             if (Input.GetKeyDown(KeyCode.W))
             {
-                Direction = Vector2Int.up;
+                Direction = SnakeDirection.UP;
             }
             else if (Input.GetKeyDown(KeyCode.S))
             {
-                Direction = Vector2Int.down;
+                Direction = SnakeDirection.DOWN;
             }
             else if (Input.GetKeyDown(KeyCode.A))
             {
-                Direction = Vector2Int.left;
+                Direction = SnakeDirection.LEFT;
             }
             else if (Input.GetKeyDown(KeyCode.D))
             {
-                Direction = Vector2Int.right;
+                Direction = SnakeDirection.RIGHT;
             }
         }
     }

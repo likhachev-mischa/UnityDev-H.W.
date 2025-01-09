@@ -9,13 +9,13 @@ namespace SnakeGame
     {
         private readonly ISnake m_snake;
         private readonly IWorldBounds m_worldBounds;
-        private readonly GameStateController m_gameStateController;
+        private readonly GameCycle m_gameCycle;
         
-        public SnakeCollisionObserver(ISnake snake, IWorldBounds worldBounds, GameStateController gameStateController)
+        public SnakeCollisionObserver(ISnake snake, IWorldBounds worldBounds, GameCycle gameCycle)
         {
             m_snake = snake;
             m_worldBounds = worldBounds;
-            m_gameStateController = gameStateController;
+            m_gameCycle = gameCycle;
         }
         
         public void Initialize()
@@ -41,7 +41,7 @@ namespace SnakeGame
         private void OnSnakeCollision()
         {
             m_snake.SetActive(false);
-            m_gameStateController.LoseGame();
+            m_gameCycle.LoseGame();
         }
     }
 }

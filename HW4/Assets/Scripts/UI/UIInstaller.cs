@@ -10,7 +10,8 @@ namespace SnakeGame
 
         public override void InstallBindings()
         {
-            Container.BindInterfacesTo<GameUI>().FromInstance(m_gameUI).AsSingle(); 
-        }   
+            Container.BindInterfacesTo<GameUI>().FromInstance(m_gameUI).AsSingle();
+            Container.BindInterfacesTo<GameUIController>().AsSingle().NonLazy();
+        }
     }
 }

@@ -19,12 +19,13 @@ namespace Game.Presenters
             m_moneyStorage = moneyStorage;
         }
 
-        public void SetPlanet(IPlanet planet)
+        public void Show(IPlanet planet)
         {
             UnsubscribePlanet();
             m_planet = planet;
             Setup();
             SubscribePlanet();
+            m_popup.Show();
         }
 
         void IInitializable.Initialize()

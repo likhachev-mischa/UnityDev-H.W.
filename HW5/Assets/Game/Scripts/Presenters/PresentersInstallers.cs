@@ -16,7 +16,6 @@ namespace Game.Presenters
             Container.BindInterfacesAndSelfTo<MoneyPresenter>().AsSingle().NonLazy();
             
             Container.BindInterfacesAndSelfTo<PlanetPopupPresenter>().AsSingle().NonLazy();
-            Container.Bind<PlanetPopupShower>().AsSingle().NonLazy();
 
             Container.BindFactory<IPlanet, PlanetView, PlanetPresenter, PlanetPresenter.Factory>().AsSingle();
             Container.BindInterfacesTo<PlanetPresentersCreator>().AsSingle().NonLazy();

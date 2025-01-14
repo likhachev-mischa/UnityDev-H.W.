@@ -10,19 +10,18 @@ namespace Game.Presenters
         private readonly IPlanet m_planet;
 
         private readonly PlanetView m_planetView;
-        private readonly MoneyView m_moneyView;
 
-        private PlanetPopupShower m_popupShower;
+        private PlanetPopupPresenter m_popupPresenter;
+        private MoneyPresenter m_moneyPresenter;
 
-        public PlanetPresenter(IPlanet planet, PlanetView planetView, MoneyView moneyView,
-            PlanetPopupShower planetPopupShower)
+        public PlanetPresenter(IPlanet planet, PlanetView planetView, MoneyPresenter moneyPresenter,
+            PlanetPopupPresenter planetPopupPresenter)
         {
             m_planet = planet;
-
             m_planetView = planetView;
-            m_moneyView = moneyView;
 
-            m_popupShower = planetPopupShower;
+            m_moneyPresenter = moneyPresenter;
+            m_popupPresenter = planetPopupPresenter;
         }
 
         public void Initialize()
@@ -99,20 +98,20 @@ namespace Game.Presenters
                 return;
             }
 
-            m_moneyView.DisableTransactionAutoPlay();
+            m_moneyPresenter.DisableTransactionAnimation();
             m_planet.GatherIncome();
-            m_moneyView.EnableTransactionAutoPlay();
+            m_moneyPresenter.EnableTransactionAnimation();
         }
 
         private void OnPlanetHeld()
         {
             if (m_planet.IsUnlocked)
-                m_popupShower.Show(m_planet);
+                m_popupPresenter.Show(m_planet);
         }
 
         private void OnCoinAnimationFinished()
         {
-            m_moneyView.PlayTransactionAnimationForced();
+            m_moneyPresenter.PlayTransactionAnimation();
         }
 
         public class Factory : PlaceholderFactory<IPlanet, PlanetView, PlanetPresenter>

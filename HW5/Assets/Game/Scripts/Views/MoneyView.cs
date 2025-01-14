@@ -1,13 +1,14 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 
 namespace Game.Views
 {
     public class MoneyView : MonoBehaviour
     {
+        public event Action OnTransactionRecorded;
+        
         public RectTransform MoneyIcon => m_moneyIcon;
-
-        public bool CanAutoPlayTransactions { get; private set; } = true;
 
         [SerializeField]
         private RectTransform m_moneyIcon;
@@ -23,22 +24,10 @@ namespace Game.Views
         public void RecordTransaction(string value)
         {
             m_nextMoneyValue = value;
-            
-            if (CanAutoPlayTransactions)
-                PlayTransactionAnimationForced();
+            OnTransactionRecorded?.Invoke();
         }
 
-        public void DisableTransactionAutoPlay()
-        {
-            CanAutoPlayTransactions = false;
-        }
-
-        public void EnableTransactionAutoPlay()
-        {
-            CanAutoPlayTransactions = true;
-        }
-
-        public void PlayTransactionAnimationForced()
+        public void PlayTransactionAnimation()
         {
             m_textAnimator.AnimateAsInt(m_moneyText.text, m_nextMoneyValue, m_moneyText);
         }

@@ -1,22 +1,22 @@
 ﻿using System;
 using Game.Views;
-using Modules.Money;
 using Modules.Planets;
 using Zenject;
 
 namespace Game.Presenters
 {
-    public class PlanetPopupPresenter : IInitializable, IDisposable
+    public class PlanetPopupPresenter : IPlanetPopupPresenter, IInitializable, IDisposable
     {
         private readonly PlanetPopup m_popup;
 
-        private readonly MoneyStorage m_moneyStorage;
         private IPlanet m_planet;
 
-        public PlanetPopupPresenter(PlanetPopup popup, MoneyStorage moneyStorage)
+        private readonly IMoneyPresenter m_moneyPresenter;
+
+        public PlanetPopupPresenter(PlanetPopup popup, IMoneyPresenter moneyPresenter)
         {
             m_popup = popup;
-            m_moneyStorage = moneyStorage;
+            m_moneyPresenter = moneyPresenter;
         }
 
         public void Show(IPlanet planet)
@@ -32,7 +32,7 @@ namespace Game.Presenters
         {
             m_popup.OnUpgradeButtonClicked += OnUpgradeButtonClicked;
 
-            m_moneyStorage.OnMoneyChanged += OnMoneyChanged;
+            m_moneyPresenter.OnMoneyChanged += OnMoneyChanged;
         }
 
         private void Setup()
@@ -69,7 +69,7 @@ namespace Game.Presenters
             UnsubscribePlanet();
             m_popup.OnUpgradeButtonClicked -= OnUpgradeButtonClicked;
 
-            m_moneyStorage.OnMoneyChanged -= OnMoneyChanged;
+            m_moneyPresenter.OnMoneyChanged -= OnMoneyChanged;
         }
 
         private void OnUpgradeButtonClicked()
@@ -91,7 +91,7 @@ namespace Game.Presenters
             SetUpgradePrice(m_planet.Price);
         }
 
-        private void OnMoneyChanged(int newvalue, int prevvalue)
+        private void OnMoneyChanged(int newvalue)
         {
             if (!m_popup.IsActive || m_planet.IsMaxLevel)
                 return;

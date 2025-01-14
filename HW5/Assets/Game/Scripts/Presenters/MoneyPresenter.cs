@@ -5,10 +5,12 @@ using Zenject;
 
 namespace Game.Presenters
 {
-    public class MoneyPresenter : IInitializable, IDisposable
+    public class MoneyPresenter : IMoneyPresenter, IInitializable, IDisposable
     {
+        public event Action<int> OnMoneyChanged;
+
         public bool IsTransactionAnimationEnabled { get; private set; } = false;
-        
+
         private readonly MoneyStorage m_moneyStorage;
         private readonly MoneyView m_moneyView;
 
@@ -25,7 +27,6 @@ namespace Game.Presenters
 
             IsTransactionAnimationEnabled = true;
             m_moneyView.OnTransactionRecorded += PlayTransactionAnimation;
-            
         }
 
         public void DisableTransactionAnimation()
@@ -41,11 +42,11 @@ namespace Game.Presenters
         {
             m_moneyView.PlayTransactionAnimation();
         }
-        
+
         void IInitializable.Initialize()
         {
             Setup();
-            m_moneyStorage.OnMoneyChanged += OnMoneyChanged;
+            m_moneyStorage.OnMoneyChanged += MoneyChanged;
             EnableTransactionAnimation();
         }
 
@@ -56,13 +57,14 @@ namespace Game.Presenters
 
         void IDisposable.Dispose()
         {
-            m_moneyStorage.OnMoneyChanged -= OnMoneyChanged;
+            m_moneyStorage.OnMoneyChanged -= MoneyChanged;
             DisableTransactionAnimation();
         }
 
-        private void OnMoneyChanged(int newvalue, int prevvalue)
+        private void MoneyChanged(int newvalue, int prevvalue)
         {
             m_moneyView.RecordTransaction(newvalue.ToString());
+            OnMoneyChanged?.Invoke(newvalue);
         }
     }
 }

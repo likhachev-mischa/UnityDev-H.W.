@@ -11,11 +11,11 @@ namespace Game.Presenters
 
         private readonly PlanetView m_planetView;
 
-        private PlanetPopupPresenter m_popupPresenter;
-        private MoneyPresenter m_moneyPresenter;
+        private IPlanetPopupPresenter m_popupPresenter;
+        private IMoneyPresenter m_moneyPresenter;
 
-        public PlanetPresenter(IPlanet planet, PlanetView planetView, MoneyPresenter moneyPresenter,
-            PlanetPopupPresenter planetPopupPresenter)
+        public PlanetPresenter(IPlanet planet, PlanetView planetView, IMoneyPresenter moneyPresenter,
+            IPlanetPopupPresenter planetPopupPresenter)
         {
             m_planet = planet;
             m_planetView = planetView;

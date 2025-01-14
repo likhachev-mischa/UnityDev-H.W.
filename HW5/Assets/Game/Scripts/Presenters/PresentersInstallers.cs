@@ -18,7 +18,7 @@ namespace Game.Presenters
             Container.BindInterfacesAndSelfTo<PlanetPopupPresenter>().AsSingle().NonLazy();
 
             Container.BindFactory<IPlanet, PlanetView, PlanetPresenter, PlanetPresenter.Factory>().AsSingle();
-            Container.BindInterfacesTo<PlanetPresentersCreator>().AsSingle().NonLazy();
+            Container.BindInterfacesTo<PlanetsCollectionPresenter>().AsSingle().NonLazy();
         }
     }
 }

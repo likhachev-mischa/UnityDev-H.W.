@@ -5,7 +5,7 @@ using Zenject;
 
 namespace Game.Presenters
 {
-    public class PlanetPresentersCreator : IInitializable, IDisposable
+    public class PlanetsCollectionPresenter : IInitializable, IDisposable
     {
         private readonly PlanetPresenter[] m_presenters;
         private readonly PlanetPresenter.Factory m_factory;
@@ -13,7 +13,7 @@ namespace Game.Presenters
         private readonly IPlanet[] m_planets;
         private readonly PlanetView[] m_views;
 
-        public PlanetPresentersCreator(PlanetPresenter.Factory factory, IPlanet[] planets, PlanetView[] views)
+        public PlanetsCollectionPresenter(PlanetPresenter.Factory factory, IPlanet[] planets, PlanetView[] views)
         {
             m_factory = factory;
             m_planets = planets;

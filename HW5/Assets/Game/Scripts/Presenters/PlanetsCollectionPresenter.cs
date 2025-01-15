@@ -27,7 +27,8 @@ namespace Game.Presenters
             m_presenters = new PlanetPresenter[m_planets.Length];
             for (int i = 0, size = m_planets.Length; i < size; ++i)
             {
-                m_presenters[i] = m_factory.Create(m_planets[i], m_views[i]);
+                m_presenters[i] = m_factory.Create(m_planets[i]);
+                m_views[i].Initialize(m_presenters[i]);
             }
         }
 

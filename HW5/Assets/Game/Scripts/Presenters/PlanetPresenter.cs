@@ -1,120 +1,89 @@
 ﻿using System;
-using Game.Views;
 using Modules.Planets;
+using UnityEngine;
 using Zenject;
 
 namespace Game.Presenters
 {
-    public class PlanetPresenter : IInitializable, IDisposable
+    public class PlanetPresenter : IPlanetPresenter, IInitializable, IDisposable
     {
+        public event Action OnUnlocked;
+        public event Action OnIncomeTimeChanged;
+        public event Action OnIncomeReady;
+        public event Action OnGathered;
+
+        public Sprite Icon => m_planet.GetIcon(IsUnlocked);
+
+        public string Price => m_planet.Price.ToString();
+        public string IncomeTime { get; private set; } = "";
+        public float IncomeProgress => m_planet.IncomeProgress;
+
+        public bool IsUnlocked => m_planet.IsUnlocked;
+        public bool IsReadyToGather => m_planet.IsIncomeReady;
+
         private readonly IPlanet m_planet;
 
-        private readonly PlanetView m_planetView;
+        private readonly PlanetPopupShower m_popupShower;
 
-        private PlanetPopupPresenter m_popupPresenter;
-        private MoneyPresenter m_moneyPresenter;
-
-        public PlanetPresenter(IPlanet planet, PlanetView planetView, MoneyPresenter moneyPresenter,
-            PlanetPopupPresenter planetPopupPresenter)
+        public PlanetPresenter(IPlanet planet, PlanetPopupShower popupShower)
         {
             m_planet = planet;
-            m_planetView = planetView;
+            m_popupShower = popupShower;
+        }
 
-            m_moneyPresenter = moneyPresenter;
-            m_popupPresenter = planetPopupPresenter;
+        public void Unlock()
+        {
+            if (m_planet.Unlock())
+                OnUnlocked?.Invoke();
+        }
+
+        public void ShowPopup()
+        {
+            m_popupShower.Show(m_planet);
+        }
+
+        public void Gather()
+        {
+            if (m_planet.GatherIncome())
+                OnGathered?.Invoke();
         }
 
         public void Initialize()
         {
-            Setup();
-            m_planet.OnUnlocked += OnPlanetUnlocked;
-            m_planet.OnIncomeTimeChanged += OnIncomeTimeChanged;
-            m_planet.OnIncomeReady += OnIncomeReady;
-            m_planet.OnGathered += OnGathered;
-
-            m_planetView.OnPlanetClicked += OnPlanetClicked;
-            m_planetView.OnPlanetHeld += OnPlanetHeld;
-            m_planetView.OnCoinAnimationFinished += OnCoinAnimationFinished;
-        }
-
-        private void Setup()
-        {
-            m_planetView.SetLock(true);
-            m_planetView.SetIcon(m_planet.GetIcon(false));
-            m_planetView.SetPrice(m_planet.Price.ToString());
+            m_planet.OnIncomeTimeChanged += OnPlanetIncomeTimeChanged;
+            m_planet.OnUnlocked += OnUnlocked;
+            m_planet.OnIncomeReady += OnPlanetIncomeReady;
         }
 
         public void Dispose()
         {
-            m_planet.OnUnlocked -= OnPlanetUnlocked;
-            m_planet.OnIncomeTimeChanged -= OnIncomeTimeChanged;
-            m_planet.OnIncomeReady -= OnIncomeReady;
-            m_planet.OnGathered -= OnGathered;
-
-            m_planetView.OnPlanetClicked -= OnPlanetClicked;
-            m_planetView.OnPlanetHeld -= OnPlanetHeld;
-            m_planetView.OnCoinAnimationFinished -= OnCoinAnimationFinished;
+            m_planet.OnIncomeTimeChanged -= OnPlanetIncomeTimeChanged;
+            m_planet.OnUnlocked -= OnUnlocked;
+            m_planet.OnIncomeReady -= OnPlanetIncomeReady;
         }
 
-        private void OnGathered(int value)
+        private void OnPlanetIncomeReady(bool obj)
         {
-            m_planetView.PlayCoinAnimation();
+            OnIncomeReady?.Invoke();
         }
 
-        private void OnIncomeReady(bool value)
+        private void OnPlanetIncomeTimeChanged(float value)
         {
-            m_planetView.SetProgressState(value);
-        }
-
-        private void OnIncomeTimeChanged(float value)
-        {
-            m_planetView.SetProgressValue(m_planet.IncomeProgress);
-
             TimeSpan timeSpan = TimeSpan.FromSeconds(value);
             int minutes = (int)timeSpan.TotalMinutes;
 
-            string progress = "";
+            IncomeTime = "";
             if (minutes >= 1)
             {
-                progress += $"{minutes}m:";
+                IncomeTime += $"{minutes}m:";
             }
 
-            progress += $"{timeSpan.Seconds}s";
-            m_planetView.SetProgressText(progress);
+            IncomeTime += $"{timeSpan.Seconds}s";
+            OnIncomeTimeChanged?.Invoke();
         }
 
-        private void OnPlanetUnlocked()
-        {
-            m_planetView.SetLock(false);
-            m_planetView.SetIcon(m_planet.GetIcon(true));
-            m_planetView.SetProgressState(false);
-        }
 
-        private void OnPlanetClicked()
-        {
-            if (!m_planet.IsUnlocked)
-            {
-                m_planet.Unlock();
-                return;
-            }
-
-            m_moneyPresenter.DisableTransactionAnimation();
-            m_planet.GatherIncome();
-            m_moneyPresenter.EnableTransactionAnimation();
-        }
-
-        private void OnPlanetHeld()
-        {
-            if (m_planet.IsUnlocked)
-                m_popupPresenter.Show(m_planet);
-        }
-
-        private void OnCoinAnimationFinished()
-        {
-            m_moneyPresenter.PlayTransactionAnimation();
-        }
-
-        public class Factory : PlaceholderFactory<IPlanet, PlanetView, PlanetPresenter>
+        public class Factory : PlaceholderFactory<IPlanet, PlanetPresenter>
         {
         }
     }

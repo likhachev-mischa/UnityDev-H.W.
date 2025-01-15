@@ -1,151 +1,95 @@
 ﻿using System;
-using Game.Views;
-using Modules.Money;
 using Modules.Planets;
+using UnityEngine;
 using Zenject;
 
 namespace Game.Presenters
 {
-    public class PlanetPopupPresenter : IInitializable, IDisposable
+    public class PlanetPopupPresenter : IPlanetPopupPresenter, IInitializable, IDisposable
     {
-        private readonly PlanetPopup m_popup;
+        public event Action OnPlanetChanged;
+        public event Action OnStatsChanged;
 
-        private readonly MoneyStorage m_moneyStorage;
+        public event Action OnUpgraded;
+        public event Action OnUpgradeStatusChanged;
+
+        public Sprite Icon => m_planet?.GetIcon(true);
+        public string Name => m_planet != default ? m_planet.Name : string.Empty;
+
+        public string Population => m_planet != default ? $"Population:{m_planet.Population}" : string.Empty;
+        public string Income => m_planet != default ? $"Income:{m_planet.MinuteIncome}" : string.Empty;
+
+        public string UpgradePrice => m_planet?.Price.ToString();
+        public string Level => m_planet != default ? $"Level:{m_planet.Level}/{m_planet.MaxLevel}" : string.Empty;
+        public bool IsPlanetMaxLevel => m_planet?.IsMaxLevel ?? default;
+        public bool CanUpgrade => m_planet?.CanUpgrade ?? default;
+
+        private readonly IMoneyPresenter m_moneyPresenter;
+
         private IPlanet m_planet;
 
-        public PlanetPopupPresenter(PlanetPopup popup, MoneyStorage moneyStorage)
+        public PlanetPopupPresenter(IMoneyPresenter moneyPresenter)
         {
-            m_popup = popup;
-            m_moneyStorage = moneyStorage;
+            m_moneyPresenter = moneyPresenter;
         }
 
-        public void Show(IPlanet planet)
+        public void SetPlanet(IPlanet planet)
         {
             UnsubscribePlanet();
             m_planet = planet;
-            Setup();
             SubscribePlanet();
-            m_popup.Show();
+            OnPlanetChanged?.Invoke();
+        }
+
+        public void Upgrade()
+        {
+            m_planet.Upgrade();
         }
 
         void IInitializable.Initialize()
         {
-            m_popup.OnUpgradeButtonClicked += OnUpgradeButtonClicked;
-
-            m_moneyStorage.OnMoneyChanged += OnMoneyChanged;
-        }
-
-        private void Setup()
-        {
-            m_popup.SetName(m_planet.Name);
-            m_popup.SetIcon(m_planet.GetIcon(true));
-
-            SetPopulation(m_planet.Population);
-            SetIncome(m_planet.MinuteIncome);
-            SetLevel(m_planet.Level, m_planet.MaxLevel);
-            SetUpgradePrice(m_planet.Price);
-
-            SetMaxLevelStatus(m_planet.IsMaxLevel);
-            SetUpgradeStatus(m_planet.CanUpgrade);
+            m_moneyPresenter.OnMoneyChanged += OnMoneyChanged;
         }
 
         private void SubscribePlanet()
         {
-            m_planet.OnIncomeChanged += OnIncomeChanged;
-            m_planet.OnPopulationChanged += OnPopulationChanged;
+            m_planet.OnIncomeChanged += OnPlanetStatsChanged;
+            m_planet.OnPopulationChanged += OnPlanetStatsChanged;
+            m_planet.OnUpgraded += OnPlanetUpgraded;
         }
 
         private void UnsubscribePlanet()
         {
-            if (m_planet is null)
+            if (m_planet == default)
                 return;
 
-            m_planet.OnIncomeChanged -= OnIncomeChanged;
-            m_planet.OnPopulationChanged -= OnPopulationChanged;
+            m_planet.OnIncomeChanged -= OnPlanetStatsChanged;
+            m_planet.OnPopulationChanged -= OnPlanetStatsChanged;
+            m_planet.OnUpgraded -= OnPlanetUpgraded;
         }
 
         void IDisposable.Dispose()
         {
             UnsubscribePlanet();
-            m_popup.OnUpgradeButtonClicked -= OnUpgradeButtonClicked;
-
-            m_moneyStorage.OnMoneyChanged -= OnMoneyChanged;
+            m_moneyPresenter.OnMoneyChanged -= OnMoneyChanged;
         }
 
-        private void OnUpgradeButtonClicked()
+        private void OnPlanetStatsChanged(int _)
         {
-            if (m_planet is null)
-                throw new NullReferenceException("Planet is not set");
+            OnStatsChanged?.Invoke();
+        }
 
-            if (!m_popup.IsActive || !m_planet.Upgrade())
+        private void OnPlanetUpgraded(int _)
+        {
+            OnUpgraded?.Invoke();
+        }
+
+        private void OnMoneyChanged()
+        {
+            if (m_planet == default)
                 return;
 
-            SetLevel(m_planet.Level, m_planet.MaxLevel);
-
-            if (m_planet.IsMaxLevel)
-            {
-                SetMaxLevelStatus(true);
-                return;
-            }
-
-            SetUpgradePrice(m_planet.Price);
-        }
-
-        private void OnMoneyChanged(int newvalue, int prevvalue)
-        {
-            if (!m_popup.IsActive || m_planet.IsMaxLevel)
-                return;
-
-            SetUpgradeStatus(m_planet.CanUpgrade);
-        }
-
-        private void OnPopulationChanged(int value)
-        {
-            if (!m_popup.IsActive)
-                return;
-
-            SetPopulation(value);
-        }
-
-        private void OnIncomeChanged(int value)
-        {
-            if (!m_popup.IsActive)
-                return;
-
-            SetIncome(value);
-        }
-
-        private void SetUpgradeStatus(bool canUpgrade)
-        {
-            m_popup.SetUpgradeButtonStatus(canUpgrade);
-        }
-
-        private void SetMaxLevelStatus(bool isMaxLevel)
-        {
-            m_popup.SetUpgradeText(isMaxLevel ? "MAX LEVEL" : "Upgrade");
-
-            m_popup.SetPriceLabelStatus(!isMaxLevel);
-            m_popup.SetUpgradeButtonStatus(!isMaxLevel);
-        }
-
-        private void SetUpgradePrice(int value)
-        {
-            m_popup.SetUpgradePrice(value.ToString());
-        }
-
-        private void SetLevel(int current, int max)
-        {
-            m_popup.SetLevel($"Level: {current}/{max}");
-        }
-
-        private void SetPopulation(int value)
-        {
-            m_popup.SetPopulation($"Population: {value}");
-        }
-
-        private void SetIncome(int value)
-        {
-            m_popup.SetIncome($"Income: {value}");
+            OnUpgradeStatusChanged?.Invoke();
         }
     }
 }
